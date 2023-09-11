@@ -254,3 +254,179 @@ Thus the folder structure will be as follows:
 
 ### Dynamic routes
 
+Lets say we want to create a route for the following:
+
+- localhost:3000/blog/1
+- localhost:3000/blog/2
+- localhost:3000/blog/3
+- localhost:3000/blog/4
+- localhost:3000/blog/5
+- localhost:3000/blog/6
+- localhost:3000/blog/7
+- localhost:3000/blog/8
+
+Thus in order to create these routes , we have to create the following files in the `pages` folder:
+
+- blog/[id].js
+- blog/1.js
+- blog/2.js
+- blog/3.js
+- blog/4.js
+- blog/5.js
+- blog/6.js
+- blog/7.js
+- blog/8.js
+- blog/9.js
+
+Here the [id].js file is a dynamic route.
+
+Thus the `blog/[id].js` file will be the parent route and the `blog/1.js` , `blog/2.js` , `blog/3.js` , `blog/4.js` , `blog/5.js` , `blog/6.js` , `blog/7.js` , `blog/8.js` and `blog/9.js` files will be the child routes.
+
+```js
+function BlogPage() {
+  return <div>Blog Page</div>
+}
+
+export default BlogPage
+```
+
+```js
+
+import { useRouter } from 'next/router'
+
+function BlogIdPage() {
+  const router = useRouter()
+  const { id } = router.query
+
+  return <div>Blog {id} Page</div>
+}
+
+export default BlogIdPage
+```
+
+### Nested Dynamic routes
+
+Lets say we want to create a route for the following:
+
+- localhost:3000/blog/1/review/1
+
+Thus in order to create these routes , we have to create the following files in the `pages` folder:
+
+- blog/[id]/review/[id].js
+
+Thus in order to create dynamic pages we named the file by  using `[]` so that it can be dynamic. Now for making nested dynamic pages we will use `[]` to name the folder.
+
+Thus the `blog` folder will have a folder named `boldId` which will have a file named `index.js` and a folder named `review` which will have a file named `[reviewId].js`.
+
+Thus the folder structure will be as follows:
+
+- blog/[id]/index.js
+- blog/[id]/review/[reviewId].js
+
+Inside [reviewId].js we will have the following code:
+
+
+```js
+import { useRouter } from 'next/router'
+
+function Review(){
+  const router = useRouter()
+  const { BlogId , reviewId } = router.query
+
+  return (
+    <div>
+      <h1>Blog {BlogId} Review {reviewId}</h1>
+    </div>
+  )
+  
+}
+
+### Catch-all routes
+
+Lets say we want to create a route for the following:
+
+- localhost:3000/blog/1
+- localhost:3000/blog/2
+- localhost:3000/blog/3
+
+Thus in order to create these routes , we have to create the following files in the `pages` folder:
+
+- blog/[...id].js
+- blog/1.js
+- blog/2.js
+- blog/3.js
+
+Here the [...id].js file is a catch-all route.
+
+Thus the `blog/[...id].js` file will be the parent route and the `blog/1.js` , `blog/2.js` and `blog/3.js` files will be the child routes.
+
+```js
+function BlogPage() {
+  return <div>Blog Page</div>
+}
+
+export default BlogPage
+```
+
+```js
+
+import { useRouter } from 'next/router'
+
+function BlogIdPage() {
+  const router = useRouter()
+  const { id } = router.query
+
+  return <div>Blog {id} Page</div>
+}
+
+export default BlogIdPage
+```
+
+### Navigate from the UI
+
+In order to navigate from the UI , we have to use the `Link` component from the `next/link` package.
+
+```js
+import Link from 'next/link'
+
+function HomePage() {
+  return (
+    <div>
+      <Link href="/about">
+        <a>About</a>
+      </Link>
+    </div>
+  )
+}
+
+export default HomePage
+```
+
+### Programmatically navigate b/w Pages
+
+In order to programmatically navigate b/w pages , we have to use the `useRouter` hook from the `next/router` package.
+
+```js
+
+import { useRouter } from 'next/router'
+
+function HomePage() {
+  const router = useRouter()
+
+  const handleClick = () => {
+    router.push('/about')
+  }
+
+  return (
+    <div>
+      <button onClick={handleClick}>About</button>
+    </div>
+  )
+}
+
+export default HomePage
+```
+
+## Data Fetching
+
+
