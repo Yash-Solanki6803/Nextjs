@@ -340,14 +340,15 @@ function Review(){
   )
   
 }
+```
 
 ### Catch-all routes
 
 Lets say we want to create a route for the following:
 
-- localhost:3000/blog/1
-- localhost:3000/blog/2
-- localhost:3000/blog/3
+- localhost:3000/blog/1/example1/etcetc
+- localhost:3000/blog/2/example2/etcetc
+- localhost:3000/blog/3//example3/etcetc
 
 Thus in order to create these routes , we have to create the following files in the `pages` folder:
 
@@ -356,7 +357,9 @@ Thus in order to create these routes , we have to create the following files in 
 - blog/2.js
 - blog/3.js
 
-Here the [...id].js file is a catch-all route.
+Here the [...id].js file is a catch-all route. That means even if the user types anything after the id , it will still be routed to the same page.
+
+Thus a route like `localhost:3000/blog/1/example1/etcetc` will be routed to the `blog/[...id].js` file.
 
 Thus the `blog/[...id].js` file will be the parent route and the `blog/1.js` , `blog/2.js` and `blog/3.js` files will be the child routes.
 
@@ -381,6 +384,13 @@ function BlogIdPage() {
 
 export default BlogIdPage
 ```
+
+Now if the url has more than one parameter than the `router.query` will return an array.
+
+Thus in this case the `router.query` will return an array of the parameters after the id.
+i.e. `[example1,etcetc]`
+
+
 
 ### Navigate from the UI
 
