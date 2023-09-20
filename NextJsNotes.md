@@ -37,15 +37,16 @@ Next.js is a great framework for building React applications. It provides a lot 
 To install Next.js, you can use the following command:
 
 - To do it manually you can do :
+
 ```bash
 npm install next react react-dom
 ```
 
 - To do it automatically you can do:
+
 ```bash
 npx create-next-app
 ```
-
 
 ## How to run Next.js?
 
@@ -89,7 +90,6 @@ npx create-next-app --typescript
 
 ## How to create a Next.js app with Tailwind CSS?
 
-
 To create a Next.js app with Tailwind CSS, you can use the following command:
 
 ```bash
@@ -104,7 +104,6 @@ After creating a Next.js app, a few folders are created. The main ones are:
 - src: This folder contains the source code for your Next.js app.
 - public: This folder contains the public files for your Next.js app.
 
-
 ### What is the difference between the public folder and the src folder?
 
 The public folder contains the public files for your Next.js app. The src folder contains the source code for your Next.js app.
@@ -112,7 +111,6 @@ The public folder contains the public files for your Next.js app. The src folder
 The `public` folder contains your assets.
 
 The `src` folder contains the pages folder , styles or the components folder depending upon the developer's choice.
-
 
 The `pages` folder contains the pages of your app as well as the `api` folder which contains the api routes.
 
@@ -157,7 +155,6 @@ So in this module we will discuss about the following:
 
 ### Route with Pages
 
-
 Next has a file based routing system.
 
 Thus in order to route to a particular page , we just have to create a file with the name of the route in the `pages` folder.
@@ -168,10 +165,10 @@ Thus if we want to create a route for the `/` route , we just have to create a f
 
 ```js
 function HomePage() {
-  return <div>Welcome to Next.js!</div>
+  return <div>Welcome to Next.js!</div>;
 }
 
-export default HomePage
+export default HomePage;
 ```
 
 #### About and Profile Page
@@ -180,29 +177,27 @@ Lets assume that we want to create a route for the `/about` route , we just have
 
 ```js
 function AboutPage() {
-  return <div>About Page</div>
+  return <div>About Page</div>;
 }
 
-export default AboutPage
+export default AboutPage;
 ```
 
 Same goes for the `/profile` route , we just have to create a file with the name `profile.js` in the `pages` folder.
 
 ```js
 function ProfilePage() {
-  return <div>Profile Page</div>
+  return <div>Profile Page</div>;
 }
 
-export default ProfilePage
+export default ProfilePage;
 ```
+
 Thus in NEXT pages are associated routes on the basis of the file name.
-
-
-
 
 ### Nested routes
 
-Lets say we want three routes : 
+Lets say we want three routes :
 
 - localhost:3000/blog
 - localhost:3000/blog/first
@@ -215,31 +210,31 @@ Thus in order to create these routes , we have to create the following files in 
 - blog/second.js
 
 Here the first.js and second.js files are nested in side the blog folder.
-  
+
 Thus the `blog.js` file will be the parent route and the `blog/first.js` and `blog/second.js` files will be the child routes.
 
 ```js
 function BlogPage() {
-  return <div>Blog Page</div>
+  return <div>Blog Page</div>;
 }
 
-export default BlogPage
+export default BlogPage;
 ```
 
 ```js
 function FirstBlogPage() {
-  return <div>First Blog Page</div>
+  return <div>First Blog Page</div>;
 }
 
-export default FirstBlogPage
+export default FirstBlogPage;
 ```
 
 ```js
 function SecondBlogPage() {
-  return <div>Second Blog Page</div>
+  return <div>Second Blog Page</div>;
 }
 
-export default SecondBlogPage
+export default SecondBlogPage;
 ```
 
 Now you must have thought why do we need to keep the blog.js file in the pages folder whereas the first.js and second.js files are in the blog folder.
@@ -284,24 +279,23 @@ Thus the `blog/[id].js` file will be the parent route and the `blog/1.js` , `blo
 
 ```js
 function BlogPage() {
-  return <div>Blog Page</div>
+  return <div>Blog Page</div>;
 }
 
-export default BlogPage
+export default BlogPage;
 ```
 
 ```js
-
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 function BlogIdPage() {
-  const router = useRouter()
-  const { id } = router.query
+  const router = useRouter();
+  const { id } = router.query;
 
-  return <div>Blog {id} Page</div>
+  return <div>Blog {id} Page</div>;
 }
 
-export default BlogIdPage
+export default BlogIdPage;
 ```
 
 ### Nested Dynamic routes
@@ -314,7 +308,7 @@ Thus in order to create these routes , we have to create the following files in 
 
 - blog/[id]/review/[id].js
 
-Thus in order to create dynamic pages we named the file by  using `[]` so that it can be dynamic. Now for making nested dynamic pages we will use `[]` to name the folder.
+Thus in order to create dynamic pages we named the file by using `[]` so that it can be dynamic. Now for making nested dynamic pages we will use `[]` to name the folder.
 
 Thus the `blog` folder will have a folder named `boldId` which will have a file named `index.js` and a folder named `review` which will have a file named `[reviewId].js`.
 
@@ -325,20 +319,20 @@ Thus the folder structure will be as follows:
 
 Inside [reviewId].js we will have the following code:
 
-
 ```js
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
-function Review(){
-  const router = useRouter()
-  const { BlogId , reviewId } = router.query
+function Review() {
+  const router = useRouter();
+  const { BlogId, reviewId } = router.query;
 
   return (
     <div>
-      <h1>Blog {BlogId} Review {reviewId}</h1>
+      <h1>
+        Blog {BlogId} Review {reviewId}
+      </h1>
     </div>
-  )
-  
+  );
 }
 ```
 
@@ -365,24 +359,23 @@ Thus the `blog/[...id].js` file will be the parent route and the `blog/1.js` , `
 
 ```js
 function BlogPage() {
-  return <div>Blog Page</div>
+  return <div>Blog Page</div>;
 }
 
-export default BlogPage
+export default BlogPage;
 ```
 
 ```js
-
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 function BlogIdPage() {
-  const router = useRouter()
-  const { id } = router.query
+  const router = useRouter();
+  const { id } = router.query;
 
-  return <div>Blog {id} Page</div>
+  return <div>Blog {id} Page</div>;
 }
 
-export default BlogIdPage
+export default BlogIdPage;
 ```
 
 Now if the url has more than one parameter than the `router.query` will return an array.
@@ -390,14 +383,12 @@ Now if the url has more than one parameter than the `router.query` will return a
 Thus in this case the `router.query` will return an array of the parameters after the id.
 i.e. `[example1,etcetc]`
 
-
-
 ### Navigate from the UI
 
 In order to navigate from the UI , we have to use the `Link` component from the `next/link` package.
 
 ```js
-import Link from 'next/link'
+import Link from "next/link";
 
 function HomePage() {
   return (
@@ -406,10 +397,10 @@ function HomePage() {
         <a>About</a>
       </Link>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;
 ```
 
 ### Programmatically navigate b/w Pages
@@ -417,26 +408,56 @@ export default HomePage
 In order to programmatically navigate b/w pages , we have to use the `useRouter` hook from the `next/router` package.
 
 ```js
-
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 function HomePage() {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleClick = () => {
-    router.push('/about')
-  }
+    router.push("/about");
+  };
 
   return (
     <div>
       <button onClick={handleClick}>About</button>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;
 ```
 
-## Data Fetching
+## Data Fetching and Pre-rendering
 
+### Pre-rendering
 
+Pre-rendering is the process of generating HTML at build time instead of request time.
+
+There are two types of pre-rendering:
+
+- Static Generation
+- Server-side Rendering
+
+By default , NEXT.js pre-renders every page in your app.
+
+### Why pre-render?
+
+1. Pre-rendering improves performance.
+   - In React app, you need to wait for the JS to be executed.
+   - Perhaps fetch fata from an external API and then render the UI.
+   - There is a wait time for the user to see the page. This is called the `First Contentful Paint`.
+   - Pre-rendering allows you to generate the HTML at build time and then reuse it on each request.
+   - With a pre-rendered page, the user can see the page immediately.
+2. Pre-rendering helps with SEO
+   - Search engines can crawl and index the page.
+   - With a React app, if the search engine hits your page , it only sees a div tag with id = root.
+   - With a pre-rendered page, the search engine can see the HTML content.
+   - This helps with SEO.
+
+### Static Generation
+
+Static Generation is the pre-rendering method that generates the HTML at build time. The pre-rendered HTML is then reused on each request.
+
+Static Generation is the pre-rendering method that generates the HTML at build time. The pre-rendered HTML is then reused on each request.
+
+Static Generation can be done with and without data.
