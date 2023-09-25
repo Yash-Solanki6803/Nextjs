@@ -460,4 +460,211 @@ Static Generation is the pre-rendering method that generates the HTML at build t
 
 Static Generation is the pre-rendering method that generates the HTML at build time. The pre-rendered HTML is then reused on each request.
 
+Pages can be built once, cached by a CDN and served to the client without having to rebuild them on each request.
+
+**NOTE**: Pre-rendering occurs every time you run the build command. But for the development server , pre-rendering occurs every time you make a request.
+
 Static Generation can be done with and without data.
+
+#### Static Generation without data
+
+If a page does not have any data requirements, then it can be pre-rendered without any data.
+
+```js
+function HomePage() {
+  return <div>Welcome to Next.js!</div>;
+}
+
+export default HomePage;
+```
+
+#### Static Generation with data
+
+If a page has data requirements, then it can be pre-rendered with data.
+
+```js
+function HomePage(props) {
+  return <div>Welcome to {props.data.name}!</div>;
+}
+
+//This function will run at build time on the server side. It is required to call it  as `getStaticProps`.
+export async function getStaticProps() {
+  const res = await fetch("https://jsonplaceholder.typicode.com/users");
+  const data = await res.json();
+
+  //It is convention to return an object with a property  called `props` which contains the data.
+  return {
+    props: {
+      users: data,
+    },
+  };
+}
+
+export default HomePage;
+```
+
+#### Pages vs Components
+
+Pages are different from components.
+
+Pages are associated with routes based on their file name.
+
+Components are not associated with routes.
+
+When a page with getStaticProps is pre-rendered ay build time , in addition to the page HTML file, Next.js generates a JSON file holding the result of running getStaticProps.
+
+The JSON file is used in client-side routing through next/link.
+
+When you navigate to a page that's pre-rendered using getStaticProps, Next.js fetches the JSON file (pre-computed at build time) and uses it as the props to create the page component client-side.
+
+Client-side page transitions will not call getStaticProps as only the exported JSON is used.
+
+#### Static generation Summary so far...
+
+Static Generation is a method of pre-rendering where the HTML pages are generated at build time
+
+With and without external Data
+
+Export getStaticProps function for external data
+
+HTML, Javascript and a JSON file are generated
+
+If you navigate directly to the page route , the HTML file is served
+
+If you navigate to the page route from a different route, the page is created client side using the JavaScript and JSON prefetched from the server.
+
+#### Static Generation with dynamic Parameters
+
+If a page has dynamic parameters , then it can be pre-rendered with data.
+
+```js
+function BlogIdPage(props) {
+  return <div>Blog {props.data.id} Page</div>;
+}
+
+export async function getStaticProps(context) {
+  const { params } = context;
+  const { id } = params;
+
+  const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+  const data = await res.json();
+
+  return {
+    props: {
+      data: data,
+    },
+  };
+}
+```
+
+But this will only work for the dynamic routes that are defined in the `pages` folder.
+
+Thus if we want to create a route for the following:
+
+- localhost:3000/blog/1
+
+Thus in order to create these routes , we have to create the following files in the `pages` folder:
+
+- blog/[id].js
+
+But this UserID can be anything. So we have to tell Next.js that this is a dynamic route and also tell it the possible values of getStaticProps function.
+
+Thus we will create a `getStatcPaths` function.
+
+So inside [id].js we will have the following code:
+
+```js
+function BlogIdPage(props) {
+  return <div>Blog {props.data.id} Page</div>;
+}
+
+export async function getStaticPaths() {
+  //you can also fetch data from an API here and map over it to create the paths array dynamically
+  return {
+    paths: [
+      { params: { id: "1" } },
+      { params: { id: "2" } },
+      { params: { id: "3" } },
+      { params: { id: "4" } },
+      { params: { id: "5" } },
+      { params: { id: "6" } },
+      { params: { id: "7" } },
+      { params: { id: "8" } },
+      { params: { id: "9" } },
+    ],
+    fallback: false,
+  };
+}
+
+export async function getStaticProps(context) {
+  const { params } = context;
+  const { id } = params;
+
+  const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+  const data = await res.json();
+
+  return {
+    props: {
+      data: data,
+    },
+  };
+}
+```
+
+#### getStaticPaths and fallback
+
+The `getStaticPaths` function is used to tell Next.js the possible values of the dynamic parameters.
+
+The `fallback` property is used to tell Next.js what to do if the user tries to access a page that is not pre-rendered.
+
+If fallback is set to `false`, then Next.js will show a 404 page if the user tries to access a page that is not pre-rendered.
+
+If fallback is set to `true`, then :
+
+- The paths returned from getStaticPaths will be rendered to HTML at build time.
+- The paths that have not been generated at build time will not result in 404 page. Instead, Next.js will serve a "fallback" version of the page on the first request to such a path.
+- In the background, Next.js will statically generate the requested path HTML and JSON. This includes running getStaticProps.
+- When that's done, the browser receives the JSON for the generated path. This will be used to automatically render the page with the required props. From the user's perspective, the page will be swapped from the fallback page to the full page.
+- At the same time, Next.js adds this path to the list of pre-rendered pages. Subsequent requests to the same path will serve the generated page, just like other pages pre-rendered at build time.
+- If the static generation fails at runtime, the request will trigger a 404 page.
+
+If fallback is set to `blocking`, then Next.js will try to generate the page on the server side. If the page is not generated on the server side, then Next.js will show a 404 page.
+
+#### Static Generation and Issues
+
+Static Generation is a method of pre-rendering where the HTML pages are generated at build time
+
+With and without external Data
+
+Issues:
+
+- If you have a lot of pages, it can take a long time to build
+
+- A page once Generated , can contain stale data till the time you rebuild the app.
+
+Thus to solve this problem , NEXT.js provides a feature called `Incremental Static Regeneration`.
+
+### Incremental Static Regeneration
+
+Incremental Static Regeneration is a feature that allows you to update existing pages by re-rendering them in the background as traffic comes in.
+
+In the getStaticProps function , we can set a `revalidate` property which is the number of seconds after which a page re-generation can occur.
+
+```js
+export async function getStaticProps(context) {
+  const { params } = context;
+  const { id } = params;
+
+  const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+  const data = await res.json();
+
+  return {
+    props: {
+      data: data,
+    },
+    revalidate: 10,
+  };
+}
+```
+
+This will re-generate the page after every 10 seconds.
