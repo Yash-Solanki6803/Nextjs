@@ -662,9 +662,145 @@ export async function getStaticProps(context) {
     props: {
       data: data,
     },
-    revalidate: 10,
+    revalidate: 30,
   };
 }
 ```
 
-This will re-generate the page after every 10 seconds.
+This will re-generate the page after every 30 seconds.
+
+Also there is one more issue with ISR.
+
+That is called "Stale while revalidate".
+
+![Stale while revalidate](./images/staleWhiteRevalidating.png)
+
+Thus this images properly explains the concept of "Stale while revalidate".
+
+Thus if a user reloads a page before the timer expires , then the user will see the stale data.
+
+If the user user reloads a page after the timer has expired then also , for the first time the user will see the stale data as a page regeneration is triggered in the background. Once the regeneration is complete , the user will see the new data.(Only after the user reloads again. The page won't reload automatically)
+
+**A regeneration is initiated only if user makes a request after the revalidate time**
+
+There might be cases where you can't use ISR. That means you can't let the user see the stale data even for a single second. For that you can use SSR.
+
+### Server-side Rendering
+
+**Problems with static generation**
+
+- We cannot fetch data at request time.
+
+  - For eg.: You are building a news website. You want to show the latest news on the home page. But with static generation , you can't fetch the latest news at request time. You can only fetch the latest news at build time. Thus you can't use static generation for this use case. You rather fetch the data on the client side by making a get request from the component. But by this you lose your SEO.
+
+- We don't get access to the incoming request
+  - For eg.: You want to fetch data based on the user's location. But with static generation , you can't fetch the data based on the user's location. You can only fetch the data at build time. Thus you can't use static generation for this use case. You rather fetch the data on the client side by making a get request from the component. But by this you lose your SEO.
+
+**Use of SSR**
+
+Next.js allows you to pre-render a page not at build time but at request time.
+
+This is called Server-side Rendering.
+
+SSR is required when you need to fetch data per request.
+
+#### SSR with getServerSideProps
+
+```js
+function HomePage(props) {
+  return <div>Welcome to {props.data.name}!</div>;
+}
+
+export async function getServerSideProps(context) {
+  const res = await fetch("https://jsonplaceholder.typicode.com/users");
+  const data = await res.json();
+
+  return {
+    props: {
+      users: data,
+    },
+  };
+}
+
+export default HomePage;
+```
+
+getServerSideProps is a function that runs at request time on the server side.
+
+It is similar to getStaticProps but the difference is that getStaticProps runs at build time whereas getServerSideProps runs at request time.
+
+getServerSideProps is used when you need to fetch data per request.
+
+This type of pre-rendering is slower than getStaticProps as the page is pre-rendered every time a request is made.
+
+- getServerSideProps runs only on the server side.
+- The function will never run client-side
+- The code you write inside getServerSideProps won't even be included in the JS bundle for the browser. That means you can write server-side code directly in it.
+- You can query the database directly in getServerSideProps.
+- getServerSideProps should return an object with a property called props. props must be an object and it can contain the data that the component needs.
+- You also don't have to worry about including API keys in getServerSideProps as that won't make it to the browser.
+- getServerSideProps is only allowed in a page and not in a component.
+- getServerSideProps is not allowed in a \_app.js file.
+
+#### SSR with Dynamic Parameters
+
+```js
+// pages/news/[category].js
+
+import { getNewsByCategory } from "../../api/news"; // Replace with your data fetching function
+
+export default function NewsCategory({ newsArticles, category }) {
+  return (
+    <div>
+      <h1>News Category: {category}</h1>
+      <ul>
+        {newsArticles.map((article) => (
+          <li key={article.id}>
+            <h2>{article.title}</h2>
+            <p>{article.content}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// Server-side data fetching function
+export async function getServerSideProps({ params }) {
+  const { category } = params;
+
+  // Fetch news articles from your API or database based on the category
+  const newsArticles = await getNewsByCategory(category);
+
+  // Return the news articles as props
+  return {
+    props: {
+      newsArticles,
+      category,
+    },
+  };
+}
+```
+
+Additional Notes:
+
+1. This code creates a dynamic route using "[category].js" in the "pages/news" directory.
+2. The getServerSideProps function fetches news articles based on the dynamic "category" parameter.
+3. Replace "getNewsByCategory" with your actual data fetching function that retrieves
+   news articles based on the category.
+4. The fetched news articles are passed as props to the NewsCategory component for rendering.
+5. This code will display news articles based on the specified category in the URL.
+6. Make sure to set up your routing configuration to handle dynamic routes.
+
+#### getServerSideProps Context
+
+The context object contains the following properties:
+
+- params - An object containing the dynamic route parameters for the current page. For example, if the current page is posts/[id]/[comment], then params will look like { id: ..., comment: ... }.
+
+- req - The HTTP request object.
+- res - The HTTP response object.
+- query - An object representing the query string. For example, if the URL is /posts/1/?preview=true, then query will be { preview: 'true' }.
+- preview - preview is true if the page is in the preview mode and undefined otherwise.
+- previewData - An object containing the result of getStaticProps (preview mode) or getServerSideProps (incremental static regeneration) during prerendering. Can be undefined if the page is not generated using these methods.
+- resolvedUrl - The actual URL without the server-side routing or the Next.js page name (if defined). For example, if the URL is /posts/1/?preview=true and the Next.js page is posts/[id], then resolvedUrl will be /posts/1.
